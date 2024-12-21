@@ -14,8 +14,11 @@ load_dotenv()
 NEWSAPI_KEY = os.getenv("NEWSAPI_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+current_date = datetime.today().strftime('%Y-%m-%d')
+previous_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+
 def fetch_news(company_name):
-    url = f"https://newsapi.org/v2/everything?q={company_name}&apiKey={NEWSAPI_KEY}"
+    url = f"https://newsapi.org/v2/everything?q={company_name}&from={current_date}&to={previous_date}&apiKey={NEWSAPI_KEY}"
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()["articles"]
@@ -36,25 +39,24 @@ def generate_summary(sentiment_data, stock_predictions):
     api_key=OPENAI_API_KEY,
     )
 
-
-    
     prompt = (
         f"Given the sentiment data: {sentiment_data} and stock predictions: {stock_predictions}, "
         "suggest which stocks might perform well today and why."
     )
 
-    response = client.chat.completions.create(
+    completion = client.chat.completions.create(
         model="gpt-4o-mini",  # GPT-4 Turbo model
         messages=[
             {"role": "system", "content": "You are a financial analyst who provides insights on stocks."},
             {"role": "user", "content": prompt}
-        ]
+        ],
+        max_tokens=100  # Adjust the value as needed
     )
-    return response['choices'][0]['message']['content'].strip()
+    return completion.choices[0].message.content
 
 def main():
     # Example companies
-    companies = ["Tesla", "Apple"]
+    companies = ["Amazon", "Apple", "Microsoft", "Google", "Meta", "Tesla", "NVIDIA", "Berkshire Hathaway", "Johnson & Johnson", "Visa", "Procter & Gamble", "JPMorgan Chase", "ExxonMobil", "UnitedHealth Group", "Walmart", "Samsung", "Pfizer", "Coca-Cola", "Disney", "Intel"]
     sentiment_data = {}
     stock_predictions = {}
 
@@ -68,8 +70,9 @@ def main():
         stock_predictions[company] = sentiment_score * 100  # Example: Scale sentiment to a stock score
 
     # Pass both arguments to generate_summary
-    insights = generate_summary(sentiment_data, stock_predictions)
+    insights = generate_summary(sentiment_data, stock_predictions) 
     print(insights)
+
 
 if __name__ == "__main__":
     main()
