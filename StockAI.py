@@ -44,7 +44,7 @@ def generate_summary(sentiment_data, stock_predictions):
     )
 
     response = client.chat.completions.create(
-        model="gpt-3",  # GPT-4 Turbo model
+        model="gpt-4o-mini",  # GPT-4 Turbo model
         messages=[
             {"role": "system", "content": "You are a financial analyst who provides insights on stocks."},
             {"role": "user", "content": prompt}
