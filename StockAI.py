@@ -74,6 +74,7 @@ def get_penny_stocks():
                         })
 
                         print(f"Added stock with news: {penny_stocks[-1]}\n\n")
+                        print("Length of penny stocks: " + str(len(penny_stocks)))
 
                         # ! Modify the penny stock cap to improve performance (best results are when the value is greates)
                         maximumSearch = 20
@@ -237,7 +238,8 @@ def generate_summary(sentiment_data):
 
 
 def main():
-    
+    # Timer to track how long program runs 
+    start = time.time()
     # // Blue chip companies
     #// companies = ["Amazon", "Apple", "Microsoft", "Google", "Meta", "Tesla", "NVIDIA", "Berkshire Hathaway", "Johnson & Johnson", "Visa", "Procter & Gamble", "JPMorgan Chase", "ExxonMobil", "UnitedHealth Group", "Walmart", "Samsung", "Pfizer", "Coca-Cola", "Disney", "Intel"]
  
@@ -272,6 +274,8 @@ def main():
     # Pass both arguments to generate_summary
     insights = generate_summary(sentiments) 
     print(insights)
+    end = time.time()
+    print(f"Time taken to run the code was {end-start} seconds")
     
 
 
