@@ -7,6 +7,12 @@ import openai
 from dotenv import load_dotenv
 import os
 
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -30,6 +36,7 @@ def analyze_sentiment(text):
 
 def get_stock_data(ticker):
     stock = yf.Ticker(ticker)
+    print(stock.info)
     return stock.history(period="1mo")
 
 
@@ -47,10 +54,10 @@ def generate_summary(sentiment_data, stock_predictions):
     completion = client.chat.completions.create(
         model="gpt-4o-mini",  # GPT-4 Turbo model
         messages=[
-            {"role": "system", "content": "You are a financial analyst who provides insights on stocks."},
+            {"role": "system", "content": "You are a financial analyst who provides insights on stocks. Be very concise and give me a score for all the stocks on the list and come up with a winner as to which stock will perform the best."},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=100  # Adjust the value as needed
+        max_tokens=200  # Adjust the value as needed
     )
     return completion.choices[0].message.content
 
@@ -62,11 +69,12 @@ def main():
 
     for company in companies:
         news = fetch_news(company)
+        get_stock_data("TSLA")
         sentiments = [analyze_sentiment(article["description"]) for article in news if article["description"]]
         sentiment_score = sum(sentiments) / len(sentiments) if sentiments else 0
         sentiment_data[company] = sentiment_score
 
-        # Simulate stock predictions (can replace with actual ML model later)
+        # Simulate stock predictions with ML model 
         stock_predictions[company] = sentiment_score * 100  # Example: Scale sentiment to a stock score
 
     # Pass both arguments to generate_summary
